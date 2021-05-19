@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.UserLabelDao">
+	<insert id="saveUserLabel" parameterType="com.behere.video.domain.UserLabel">
+		INSERT INTO t_label (
+			user_id,
+			critics_id,
+			score,
+			coment
+		) VALUES (
+			#{userId},
+			#{criticsId},
+			#{score},
+			#{coment}
+		)
+	</insert>
+	
+	<select id="queryUserLabelByUserId" resultType="com.behere.video.domain.UserLabel">
+		SELECT
+			*
+		FROM
+			t_label
+		WHERE
+			user_id = #{userId}
+	</select>
+</mapper>

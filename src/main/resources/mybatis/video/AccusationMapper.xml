@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.AccusationDao">
+
+	<select id="queryAccusations" resultType="com.behere.video.domain.Accusation">
+		SELECT
+			*
+		FROM
+			t_accusation
+	</select>
+	
+	<insert id="saveAccusationInformation">
+		INSERT INTO t_accusation_information (
+			id,
+			report_user_id,
+			reported_user_id,
+			accusation_id,
+			content
+		) VALUES (
+			#{id},
+			#{reportUserId},
+			#{reportedUserId},
+			#{accusationId},
+			#{content}
+		)
+	</insert>
+	
+	<insert id="saveAccusationPic">
+		INSERT INTO t_accusation_pic (
+			id,
+			report_id,
+			pic
+		) VALUES (
+			#{id},
+			#{reportId},
+			#{pic}
+		)
+	</insert>
+</mapper>

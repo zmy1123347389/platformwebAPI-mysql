@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.RechargeDao">
+
+	<select id="queryRechargePackages" resultType="com.behere.video.domain.RechargePackage">
+		SELECT
+			*
+		FROM
+			t_recharge_package
+	</select>
+	
+	<select id="queryRechargePackageById" resultType="com.behere.video.domain.RechargePackage">
+		SELECT * FROM t_recharge_package WHERE id = #{rechargePackageId}
+	</select>
+
+	<insert id="saveRechargeRecord" parameterType="com.behere.video.domain.RechargeRecord">
+		INSERT INTO t_recharge_record (
+			order_id,
+			user_id,
+			price,
+			diamond,
+			pay_type
+		) VALUES (
+			#{orderId},
+			#{userId},
+			#{price},
+			#{diamond},
+			#{payType}
+		)
+	</insert>
+	
+	<select id="queryRechargeRecordByOrderId" resultType="com.behere.video.domain.RechargeRecord">
+		SELECT * FROM t_recharge_record WHERE order_id = #{orderId}
+	</select>
+
+	<update id="updateRechargeRecordStatus">
+		UPDATE
+			t_recharge_record
+		SET
+			status = 1
+		WHERE
+			order_id = #{orderId}
+	</update>
+	
+	<select id="queryRechargeRecord" resultType="com.behere.video.domain.RechargeRecord">
+		SELECT * FROM t_recharge_record WHERE user_id = #{userId} AND status = 1 ORDER BY create_time DESC
+	</select>
+
+	<insert id="saveInvitationRechargeRecord" parameterType="com.behere.video.domain.InvitationRecharge">
+		INSERT INTO t_invitation_recharge (
+			id,
+			user_id,
+			balance,
+			give_balance,
+			invitation_user
+		)VALUES (
+			#{id},
+			#{userId},
+			#{balance},
+			#{giveBalance},
+			#{invitationUser}
+		)
+	</insert>
+
+    <select id="queryInvitationRechargeRecords" resultType="com.behere.video.model.InvitationRechargeRecord">
+        SELECT
+            u.id as user_id,
+            u.nick_name,
+            u.head_portrait,
+         r.create_time,
+         r.balance,
+         r.give_balance
+        FROM
+            t_invitation_recharge r
+        LEFT JOIN t_user u ON r.user_id = u.id
+        WHERE
+            r.invitation_user = #{userId}
+        ORDER BY
+            r.create_time DESC
+    </select>
+
+	<select id="queryWithdrawalRecordList" resultType="com.behere.video.domain.WithdrawalRecordList">
+        SELECT * FROM t_withdrawal WHERE user_id = #{userId}
+        <if test="createTime != null and createTime != ''">
+            AND date_format(create_time, '%Y-%m') = #{createTime}
+        </if>
+        ORDER BY create_time DESC
+    </select>
+    
+    <select id="sumWithdrawal" resultType="double">
+        SELECT IFNULL(sum(money), 0) as money FROM t_withdrawal WHERE user_id = #{userId} AND status = 1
+    </select>
+</mapper>

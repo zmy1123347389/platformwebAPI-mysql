@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.AreaDao">
+
+	<select id="queryAreaByPid" resultType="com.behere.video.domain.Area" parameterType="java.lang.Integer">
+		SELECT
+			*
+		FROM
+			t_area
+		WHERE
+			pid = #{pid}
+	</select>
+
+	<select id="queryAreas" resultType="com.behere.video.domain.Area">
+		SELECT
+			*
+		FROM
+			t_area
+	</select>
+</mapper>

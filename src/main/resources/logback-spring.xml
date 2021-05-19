@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+	<contextName>logback</contextName>
+	<!--输出到控制台 -->
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<!--按天生成日志 -->
+	<appender name="logFile"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<Prudent>true</Prudent>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<FileNamePattern>
+				applog/%d{yyyy-MM-dd}/%d{yyyy-MM-dd}.log
+			</FileNamePattern>
+		</rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss} -%msg%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<logger name="com.behere" additivity="false">
+		<appender-ref ref="console" />
+		<appender-ref ref="logFile" />
+	</logger>
+
+	<logger name="com.behere.video.dao" level="debug" additivity="false">
+		<appender-ref ref="console" />
+	</logger>
+
+
+	<logger name="cn.iautos.manager" level="debug" />
+
+	<!--log4jdbc -->
+	<logger name="jdbc.sqltiming" level="debug" />
+	<logger name="com.ibatis" level="debug" />
+	<logger name="com.ibatis.common.jdbc.SimpleDataSource" level="debug" />
+	<logger name="com.ibatis.common.jdbc.ScriptRunner" level="debug" />
+	<logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate"
+		level="debug" />
+	<logger name="java.sql.Connection" level="debug" />
+	<logger name="java.sql.Statement" level="debug" />
+	<logger name="java.sql.PreparedStatement" level="debug" />
+	<logger name="java.sql.ResultSet" level="debug" />
+
+
+	<root level="error">
+		<appender-ref ref="console" />
+		<appender-ref ref="logFile" />
+	</root>
+
+</configuration>

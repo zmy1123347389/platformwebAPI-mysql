@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.WithdrawalDao">
+
+	<insert id="saveApplyWithdrawal" parameterType="com.behere.video.domain.Withdrawal">
+		INSERT INTO t_withdrawal (
+			user_id,
+			type,
+			money,
+			username,
+			account_name
+		) VALUES (
+			#{userId},
+			#{type},
+			#{money},
+			#{username},
+			#{accountName}
+		)
+	</insert>
+	
+	<!--<select id="queryWithdrawalListByUserId" resultType="com.behere.video.domain."-->
+</mapper>

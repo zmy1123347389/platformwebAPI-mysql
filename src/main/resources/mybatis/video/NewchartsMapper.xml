@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.NewchartsDao">
+
+	<select id="queryAnchorNewCharts" resultType="com.behere.video.domain.Newcharts">
+		SELECT
+		u.id as user_id,
+		u.nick_name,
+		u.head_portrait,
+		sum(r.flower) as flower,
+		u.auth,
+		u.age,
+		u.gender
+		FROM
+		t_account_book r
+		LEFT JOIN t_user u ON r.to_user = u.id
+		WHERE
+		r.flower > 0
+		<if test="date == 0">
+			AND YEARWEEK(r.create_time) = YEARWEEK(NOW())
+		</if>
+		<if test="date == 1">
+			AND date_format(r.create_time, '%Y%m') = date_format(curdate() , '%Y%m')
+		</if>
+
+		GROUP BY
+		r.to_user
+		ORDER BY
+		sum(r.flower)
+		DESC
+    </select>
+
+	<select id="queryRicherNewCharts" resultType="com.behere.video.domain.Newcharts">
+		SELECT
+			u.id as user_id,
+			u.nick_name,
+			u.head_portrait,
+			sum(r.flower) as flower,
+			u.auth,
+			u.age,
+			u.gender
+		FROM
+			t_account_book r
+		LEFT JOIN t_user u ON r.from_user = u.id
+		where r.flower > 0
+		<if test="date == 0">
+			AND YEARWEEK(r.create_time) = YEARWEEK(NOW())
+		</if>
+		<if test="date == 1">
+			AND date_format(r.create_time, '%Y%m') = date_format(curdate() , '%Y%m')
+		</if>
+		GROUP BY
+			r.from_user
+		ORDER BY
+			sum(r.flower)
+		DESC
+	</select>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.WatchUserDao">
+
+	<insert id="saveWatchRecord" parameterType="com.behere.video.domain.WatchRecord">
+		INSERT INTO
+			t_watch_record (
+				id,
+				from_user,
+				to_user,
+			  	flower
+			) VALUES (
+				#{id},
+				#{fromUser},
+				#{toUser},
+				#{flower}
+			)
+	</insert>
+	
+	
+	<select id="queryWatchMeList" resultType="com.behere.video.model.WatchUserModel">
+		SELECT
+			u.id AS fromUser,
+			u.head_portrait,
+			SUM(r.flower) AS flower,
+			u.age,
+			u.signature,
+			u.gender,
+			u.nick_name,
+			u.online,
+			r.create_time
+		FROM
+			t_watch_record r
+		LEFT JOIN
+			t_user u
+		ON
+			r.from_user = u.id
+		WHERE
+			r.to_user = #{toUser} AND r.deleted = 0
+		GROUP BY
+			r.from_user
+		ORDER BY
+			sum(r.flower) DESC
+	</select>
+
+	<select id="queryMyWatchList" resultType="com.behere.video.model.WatchUserModel">
+		SELECT
+			u.id AS toUser,
+			u.head_portrait,
+			SUM(r.flower) AS flower,
+			u.age,
+			u.gender,
+			u.signature,
+			u.nick_name,
+			u.online,
+			r.create_time
+		FROM
+			t_watch_record r
+		LEFT JOIN
+			t_user u
+		ON
+			r.to_user = u.id
+		WHERE
+			r.from_user = #{fromUser} AND r.deleted = 0
+		GROUP BY
+			r.to_user
+		ORDER BY
+			sum(r.flower) DESC
+	</select>
+	
+	<select id="queryWatchPrices" resultType="com.behere.video.model.WatchPriceModel">
+		SELECT * FROM t_watch_price
+	</select>
+	
+	<select id="queryWatchPriceById" resultType="java.lang.Integer">
+		SELECT price FROM t_watch_price WHERE id = #{priceId}
+	</select>
+	
+	<select id="deleteMyWatchRecord">
+		UPDATE t_watch_record SET deleted = 1 WHERE from_user = #{fromUser} AND to_user = #{toUser}
+	</select>
+	
+	<select id="queryWatchFlowerByFromUserId" resultType="java.lang.Long">
+		SELECT SUM(flower) FROM t_watch_record WHERE deleted = 0 AND from_user = #{fromUser} AND to_user = #{toUser}
+	</select>
+</mapper>

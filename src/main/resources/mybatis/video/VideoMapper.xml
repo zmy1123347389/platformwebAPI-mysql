@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.VideoDao">
+
+	<insert id="saveVideo" parameterType = "com.behere.video.domain.Video">
+		INSERT INTO t_short_video (
+			id,
+			title,
+			user_id,
+			flower,
+			url,
+			image,
+			secret,
+			duration
+		) VALUES (
+			#{id},
+			#{title},
+			#{userId},
+			#{flower},
+			#{url},
+			#{image},
+			#{secret},
+			#{duration}
+		)
+	</insert>
+	
+	<insert id="likeVideo">
+		INSERT INTO t_video_like (
+			id,
+			video_id,
+			user_id
+		) VALUES (
+			#{id},
+			#{videoId},
+			#{userId}
+		)
+	</insert>
+	
+	<update id="updateLikeVideo">
+		UPDATE
+			t_video_like
+		SET
+			is_like = #{isLike}
+		WHERE
+			user_id = #{userId}
+		AND
+			video_id = #{videoId}
+	</update>
+	
+	<select id="queryVideoLikeByUserIdWithVideoId" resultType="com.behere.video.domain.VideoLike">
+		SELECT * FROM t_video_like WHERE user_id = #{userId} AND video_id = #{videoId}
+	</select>
+	
+	<insert id="saveVideoComment" >
+		INSERT INTO t_video_comment (
+			id,
+			video_id,
+			user_id,
+			comment
+		) VALUES (
+			#{id},
+			#{videoId},
+			#{userId},
+			#{comment}
+		)
+	</insert>
+
+	<select id="queryVideos" resultType="com.behere.video.model.VideoModel">
+		SELECT
+			v.id,
+			count(DISTINCT(l.id)) AS likeNumber,
+			count(DISTINCT(m.id)) AS commentNumber,
+			v.title,
+			v.image,
+			v.user_id,
+			v.flower,
+			v.secret,
+			v.create_time,
+			u.nick_name,
+			v.transmit,
+			duration,
+			url,
+			u.head_portrait
+		FROM
+			t_short_video v
+		LEFT JOIN t_user u ON u.id = v.user_id
+		LEFT JOIN t_video_like l ON v.id = l.video_id
+		LEFT JOIN t_video_comment m ON v.id = m.video_id
+		WHERE v.secret = #{secret} AND v.deleted = 0
+		GROUP BY
+			v.id
+		ORDER BY v.create_time DESC
+	</select>
+
+	<select id="querySecretVideos" resultType="com.behere.video.model.VideoModel">
+		SELECT
+			v.id,
+			count(DISTINCT(r.id)) * v.flower as harvest,
+			count(DISTINCT(l.id)) AS likeNumber,
+			count(DISTINCT(m.id)) AS commentNumber,
+			v.title,
+			v.image,
+			v.user_id,
+			v.flower,
+			v.transmit,
+			v.secret,
+			v.create_time,
+			u.nick_name,
+			duration,
+			u.head_portrait
+		FROM
+			t_short_video v
+		LEFT JOIN t_user u ON u.id = v.user_id
+		LEFT JOIN t_video_like l ON v.id = l.video_id AND l.is_like = 1
+		LEFT JOIN t_video_comment m ON v.id = m.video_id
+		LEFT JOIN t_video_record r ON r.video_id = v.id
+		WHERE v.secret = #{secret} AND v.deleted = 0
+		GROUP BY
+			v.id
+		ORDER BY v.create_time DESC
+	</select>
+
+
+
+	<select id="queryVideoByVideoId" resultType="com.behere.video.model.VideoInfoModel">
+		SELECT
+			v.id,
+			v.image,
+			v.url,
+			v.title,
+			v.user_id,
+			v.flower,
+			v.secret,
+			u.head_portrait,
+			u.nick_name
+		FROM
+			t_short_video v
+		LEFT JOIN t_user u ON v.user_id = u.id
+		WHERE
+			v.id = #{videoId}
+	</select>
+	
+	<select id="queryVideoLikes" resultType="java.lang.Long">
+		SELECT count(*) FROM t_video_like WHERE is_like = 1 AND video_id = #{videoId}
+	</select>
+	
+	<select id="queryVideoCommentNumber" resultType="java.lang.Long">
+		SELECT count(*) FROM t_video_comment WHERE video_id = #{videoId}
+	</select>
+
+    <select id="queryVideoHarvest" resultType="java.lang.Long">
+		SELECT IFNULL(count(*) * v.flower, 0)  FROM t_video_record r LEFT JOIN t_short_video v ON r.video_id = v.id  WHERE video_id = #{videoId}
+	</select>
+	
+	<select id="queryVideoComments" resultType="com.behere.video.domain.VideoComment">
+		SELECT v.*, u.nick_name, u.head_portrait FROM t_video_comment v LEFT JOIN t_user u ON v.user_id = u.id WHERE v.video_id = #{videoId}
+		<if test="userId != 0">
+		 	AND v.user_id = #{userId}
+		</if>
+		ORDER BY v.create_time DESC
+	</select>
+
+	<select id="queryWatchVideoRecord" resultType="com.behere.video.domain.WatchVideoRecord">
+		SELECT * FROM t_video_record WHERE user_id = #{userId} AND video_id = #{videoId}
+	</select>
+
+	<insert id="saveWatchVideoRecord" parameterType="com.behere.video.domain.WatchVideoRecord">
+		INSERT INTO t_video_record (
+			id,
+			video_id,
+			user_id
+		) VALUES (
+			#{id},
+			#{videoId},
+			#{userId}
+		)
+	</insert>
+
+	<update id="updateVideoTransmitNum" >
+		UPDATE
+			t_short_video
+		SET
+			transmit = transmit + 1
+		WHERE
+			id = #{videoId}
+	</update>
+	
+	<update id="deleteVideoById">
+		UPDATE t_short_video SET deleted = 1 WHERE id = #{videoId}
+
+	</update>
+</mapper>

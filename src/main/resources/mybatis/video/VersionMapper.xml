@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.VersionDao">
+
+	<select id="queryVersionByDeviceType" resultType="com.behere.video.domain.Version">
+		SELECT
+			*
+		FROM
+			t_device_version
+		WHERE
+			device_type = #{deviceType}
+	</select>
+
+	<select id="querySwitch" resultType="com.behere.video.domain.IosSwitch">
+		SELECT * FROM t_switch WHERE version_no = #{versionNo}
+	</select>
+</mapper>

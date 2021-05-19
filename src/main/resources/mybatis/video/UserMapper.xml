@@ -1,0 +1,956 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.behere.video.dao.UserDao">
+
+	<select id="queryUserByMobile" resultType="com.behere.video.domain.User" parameterType="java.lang.String">
+		SELECT
+			*
+		FROM
+			t_user
+		WHERE
+			mobile = #{mobile}
+	</select>
+
+	<select id="queryUserByMobileAndPassword" resultType="com.behere.video.model.UserModel">
+		SELECT
+			u.id,
+			u.head_portrait,
+			u.nick_name,
+			u.city,
+			u.age,
+			p.name as professionName,
+			u.signature,
+			u.wechat_code,
+			u.mobile,
+			u.gender,
+			u.netease_token,
+			u.balance,
+			u.service_price,
+			u.auth,
+			u.flower,
+			u.online,
+			u.vip,
+			u.deleted
+		FROM
+			t_user u
+		LEFT JOIN
+			t_profession p
+		ON
+			u.profession = p.id
+		WHERE
+			u.mobile = #{mobile} AND u.password = #{password}
+	</select>
+
+	<insert id="saveUser" keyProperty="id" keyColumn="id" useGeneratedKeys="true" parameterType="com.behere.video.domain.User">
+		INSERT INTO t_user(
+			mobile,
+			password,
+			username,
+			my_invitation_code,
+			invitation_code
+		) VALUES (
+			#{mobile},
+			#{password},
+			#{mobile},
+			#{myInvitationCode},
+			#{invitationCode}
+		)
+	</insert>
+
+	<update id="updateUserHeadPortrait">
+		UPDATE
+			t_user
+		SET
+			head_portrait = #{headPortrait}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<update id="updateUserIdentityCard">
+		UPDATE
+			t_user
+		SET
+			identity_card = #{identityCard}
+		WHERE
+			id = #{userId}
+	</update>
+	
+	<update id="updateWechatQRcode">
+		UPDATE
+			t_user
+		SET
+			wechat_code = #{wechatCode}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<select id="queryUserById" parameterType="java.lang.Long" resultType="com.behere.video.model.UserModel">
+		SELECT
+			u.id,
+			u.head_portrait,
+			u.nick_name,
+			u.city,
+			u.age,
+			p.name as professionName,
+			u.signature,
+			u.wechat_code,
+			u.mobile,
+			u.gender,
+			u.netease_token,
+			u.balance,
+			u.service_price,
+			u.auth,
+			u.flower,
+			u.online,
+			u.vip,
+			u.my_invitation_code,
+			u.invitation_code,
+			u.face_time
+		FROM
+			t_user u
+		LEFT JOIN
+			t_profession p
+		ON
+			u.profession = p.id
+		WHERE
+			u.id = #{userId}
+	</select>
+	
+	<select id="queryUserByNickName" parameterType="java.lang.String" resultType="com.behere.video.model.UserModel">
+		SELECT
+			id
+		FROM
+			t_user
+		WHERE
+			nick_name = #{nickName}
+	</select>
+	
+	<update id="updateUserInfoById" parameterType="com.behere.video.domain.User">
+		UPDATE
+			t_user
+		SET
+			nick_name = #{nickName},
+    		city = #{city},
+    		age = #{age},
+    		<if test="profession != 0">
+    		profession = #{profession},
+			</if>
+    		signature = #{signature}
+		WHERE
+			id = #{id}		
+	</update>
+	
+	<update id="updateUserGenderById" parameterType="com.behere.video.domain.User">
+		UPDATE
+			t_user
+		SET
+			gender = #{gender}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<select id="queryAreaListByPid" resultType="com.behere.video.domain.Area">
+		select
+			*
+		FROM
+			t_area
+		WHERE
+			pid = #{pid}
+	</select>
+	
+	<update id="updateUserNeteaseToken">
+		UPDATE
+			t_user
+		SET
+			netease_token = #{neteaseToken}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<update id="updatePassword">
+		UPDATE
+			t_user
+		SET
+			password = #{password}
+		WHERE
+			mobile = #{mobile}
+	</update>
+
+	<update id="updateServicePrice">
+
+		UPDATE
+			t_user
+		SET
+			service_price = #{servicePrice}
+		WHERE
+			id = #{userId}
+	</update>
+	
+	<update id="updateUserVip">
+		UPDATE
+			t_user
+		SET
+			vip = #{vip}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<select id="queryUsersByGender" resultType="com.behere.video.model.UserSearchModel" parameterType="java.lang.Short">
+		SELECT
+			id,
+			nick_name,
+			age,
+			gender,
+			signature,
+			head_portrait
+		FROM
+			t_user u
+		WHERE
+			u.gender = #{gender}
+	</select>
+	
+	<select id="likeUserByNickName" resultType="com.behere.video.model.UserSearchModel">
+		SELECT
+			id,
+			nick_name,
+			age,
+			gender,
+			signature,
+            online,
+			head_portrait,
+            face_time
+		FROM
+			t_user u
+		WHERE
+			1 = 1
+		<if test="idOrNickName != null and idOrNickName != ''">
+			AND (u.id like '${idOrNickName}%' or u.nick_name LIKE '${idOrNickName}%')
+		</if>
+		<if test="gender != 0">
+			AND u.gender = #{gender}
+		</if>
+	</select>
+	
+	<select id="queryAllUsers" resultType="com.behere.video.model.UserModel">
+		SELECT
+			*
+		FROM
+			t_user
+	</select>
+	
+	<update id="addFlower">
+		UPDATE
+			t_user
+		SET
+			flower = flower + #{num}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<update id="reduceFlower">
+		UPDATE
+			t_user
+		SET
+			flower = flower - #{num}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<update id="reduceBalance">
+		UPDATE
+			t_user
+		SET
+			balance = balance - #{num}
+		WHERE
+			id = #{userId} AND balance >= #{num}
+	</update>
+
+	<update id="addBalance">
+		UPDATE
+			t_user
+		SET
+			balance = balance + #{num}
+		WHERE
+			id = #{userId}
+	</update>
+
+	<insert id="saveLockInformation" parameterType="com.behere.video.domain.Unlock">
+		INSERT INTO t_unlock (
+			id,
+			lock_user_id,
+			unlock_user_id
+		) VALUES (
+			#{id},
+			#{lockUserId},
+			#{unlockUserId}
+		)
+	</insert>
+	
+	<select id="queryUnlockWechatPrice" resultType="com.behere.video.domain.UnlockWechatPrice">
+		SELECT
+			*
+		FROM
+			t_unlock_wechat_price
+	</select>
+	
+	<select id="queryUnlock" parameterType="com.behere.video.domain.Unlock" resultType="com.behere.video.domain.Unlock">
+		SELECT * FROM t_unlock WHERE lock_user_id = #{lockUserId} AND unlock_user_id = #{unlockUserId}
+	</select>
+	
+	<select id="isExsitNickName" resultType="com.behere.video.domain.User">
+		SELECT * FROM t_user WHERE nick_name = #{nickName} AND id != #{userId}
+	</select>
+
+    <update id="updateUserIndexImage">
+        UPDATE
+          t_user
+        SET
+          index_image = #{indexImage}
+        WHERE
+          id = #{userId}
+    </update>
+
+    <update id="updateUserAuthVideo">
+        UPDATE
+          t_user
+        SET
+          auth_video = #{authVideo}
+        WHERE
+          id = #{userId}
+    </update>
+
+	<select id="queryUserAuth" resultType="com.behere.video.model.UserAuthModel">
+		SELECT
+			id,
+			identity_card,
+			index_image,
+			auth_video
+		FROM
+			t_user
+		WHERE
+			id = #{userId}
+	</select>
+	
+	<insert id="saveUserAuth">
+		INSERT INTO t_user_auth (
+			user_id
+		) VALUES (
+			#{userId}
+		)
+	</insert>
+
+	<!-- 查询用户首页 start-->
+	<select id="queryUserIndex" resultType="com.behere.video.domain.UserIndex">
+		  SELECT
+				u.id,
+				u.nick_name,
+				u.gender,
+				u.online,
+				u.age,
+				u.wechat_code,
+				u.head_portrait,
+				u.service_price,
+				u.city,
+				u.auth,
+				u.offline_time,
+				u.face_time
+		  FROM
+			t_user u
+		  WHERE
+			u.id = #{userId}
+	</select>
+
+	<select id="queryUserIndexWatch" resultType="com.behere.video.domain.UserIndexWatch">
+		SELECT
+			u.id,
+			u.headPortrait,
+			u.nick_name,
+			u.gender,
+			sum(w.flower) AS flower,
+			u.age,
+			u.auth
+		FROM
+			t_watch_record w
+		LEFT JOIN t_user u ON w.from_user = u.id
+		WHERE
+			w.to_user = #{userId}
+		GROUP BY
+			w.from_user
+		ORDER BY
+			sum(w.flower) DESC
+		LIMIT 0, 1
+	</select>
+	
+	<select id="queryUserIndexLabel" resultType="com.behere.video.domain.UserIndexLabel">
+		SELECT l.id, l.coment FROM t_label l WHERE l.user_id = #{userId}
+	</select>
+	
+	<select id="queryUserIndexVideo" resultType="com.behere.video.model.VideoModel">
+		SELECT
+			v.id,
+			v.title,
+			v.image,
+			v.flower,
+			v.secret,
+			v.create_time,
+			u.nick_name,
+			duration,
+			url,
+			u.head_portrait
+		FROM
+			t_short_video v
+		LEFT JOIN t_user u ON u.id = v.user_id
+		WHERE v.user_id = #{userId} AND v.deleted = 0
+		ORDER BY v.create_time DESC
+		LIMIT 0, 3
+	</select>
+	
+	<select id="countUserWatch" resultType="java.lang.Integer">
+		SELECT
+			count(DISTINCT(w.from_user))
+		FROM
+			t_watch_record w
+		LEFT JOIN t_user u ON w.from_user = u.id
+		WHERE
+			w.to_user = #{userId}
+	</select>
+	
+	<select id="countUserIndexScore" resultType="com.behere.video.model.UserIndexScore">
+		SELECT FORMAT(AVG(l.score),1) as score FROM t_label l WHERE l.user_id = #{userId}
+	</select>
+
+	<!-- 查询用户首页 end -->
+	
+	<insert id="saveUserPic">
+		INSERT INTO t_user_pic (
+			id,
+			pic_url,
+			user_id
+		) VALUES (
+			#{id},
+			#{picUrl},
+			#{userId}
+		)
+	</insert>
+	
+	<select id="queryUserPics" resultType="com.behere.video.domain.UserPic">
+		SELECT id, pic_url FROM t_user_pic p WHERE user_id = #{userId}
+	</select>
+	
+	<delete id="deleteUserPic">
+		DELETE FROM t_user_pic WHERE id = #{picId}
+	</delete>
+	
+	<select id="queryMyFlower" resultType="java.lang.Double">
+		SELECT flower FROM t_user WHERE id = #{userId}
+	</select>
+
+	<select id="queryMyEarningsDetails" resultType="com.behere.video.domain.AccountBook">
+		SELECT b.id, b.business_id, b.from_user, b.to_user,u.nick_name, b.flower / 2 - b.reduce_flower as flower, b.type, b.create_time FROM t_account_book b left join t_user u on u.id=from_user WHERE
+		  b.to_user = #{userId} AND b.flower > 0
+		  <if test="createTime != null and createTime !=''">
+              AND date_format(b.create_time, '%Y-%m') = #{createTime}
+          </if>
+		ORDER BY b.create_time DESC
+	</select>
+	
+	<select id="queryOnlineUser" resultType="com.behere.video.domain.OnlineUser">
+		SELECT
+			u.id,
+			u.head_portrait,
+			u.nick_name,
+			u.city,
+			u.age,
+			p.name as professionName,
+			u.signature,
+			u.wechat_code,
+			u.mobile,
+			u.gender,
+			u.netease_token,
+			u.balance,
+			u.service_price,
+			u.auth,
+			u.flower,
+			u.vip,
+            u.face_time
+		FROM
+			t_user u
+		LEFT JOIN
+			t_profession p
+		ON
+			u.profession = p.id
+		WHERE
+            1=1
+			AND
+		(u.online = 0 or u.online = 1)
+            <if test="gender != -1">
+                AND u.gender = #{gender}
+            </if>
+			AND u.gender != 0
+			<if test="auth != -1">
+				AND	u.auth = 1 - #{auth}
+			</if>
+	  	<if test="offset != -1 and limit != -1">
+			LIMIT ${offset}, ${limit}
+		</if>
+	</select>
+
+	<select id="queryUserVideos" resultType="com.behere.video.model.VideoModel">
+		SELECT
+			v.id,
+			count(DISTINCT(l.id)) AS likeNumber,
+			count(DISTINCT(m.id)) AS commentNumber,
+			count(DISTINCT(r.id)) * v.flower AS harvest,
+			v.title,
+			v.image,
+			v.user_id,
+			v.flower,
+			v.secret,
+			v.url,
+			v.create_time,
+			u.nick_name,
+			duration,
+			u.head_portrait
+		FROM
+			t_short_video v
+		LEFT JOIN t_user u ON u.id = v.user_id
+		LEFT JOIN t_video_like l ON v.id = l.video_id AND l.is_like = 1
+		LEFT JOIN t_video_comment m ON v.id = m.video_id
+		LEFT JOIN t_video_record r ON v.id = r.video_id
+		WHERE v.user_id = #{userId} AND v.deleted = 0
+		GROUP BY
+			v.id
+		ORDER BY v.create_time DESC
+	</select>
+	
+	<select id="queryUserByUnionId" resultType="com.behere.video.model.UserModel">
+		SELECT * FROM t_user WHERE union_id = #{unionId}
+	</select>
+
+	<insert id="saveOpenUser" keyProperty="id" keyColumn="id" useGeneratedKeys="true"  parameterType="com.behere.video.domain.WxLogin">
+		INSERT INTO t_user(
+			head_portrait,
+			nick_name,
+			union_id,
+			my_invitation_code
+		) VALUES (
+			#{headimgurl},
+			#{nickName},
+			#{unionId},
+			#{myInvitationCode}
+		)
+	</insert>
+
+	<update id="updateUserNickName" parameterType="com.behere.video.domain.WxLogin">
+		UPDATE t_user
+	  	SET nick_name = #{nickName}
+	  	WHERE id = #{userId}
+	</update>
+
+	<select id="queryNewestRechargeReocrdByUserId" resultType="com.behere.video.domain.RechargeRecord">
+		SELECT * FROM t_recharge_record WHERE user_id = #{userId} AND status = 1 ORDER BY create_time DESC LIMIT 0,1
+	</select>
+
+	<update id="updateUserOnline">
+		UPDATE
+			t_user
+		SET
+			online = #{status}
+		WHERE
+			id = #{userId}
+	</update>
+    
+    <select id="queryUserByInvitationCode" resultType="com.behere.video.model.UserModel">
+        SELECT * FROM t_user WHERE my_invitation_code = #{invitationCode}
+    </select>
+
+    <select id="queryInvitationUsers" resultType="com.behere.video.model.InvitationUser">
+       SELECT
+			u.id as user_id,
+			u.nick_name,
+			u.create_time,
+			u.head_portrait
+		FROM
+			t_user u
+		WHERE
+			u.invitation_code = #{invitationCode} ORDER BY create_time DESC
+    </select>
+	
+	<select id="queryShareUserConfig" resultType="java.lang.String">
+		select url from t_share_config where type = #{type}
+	</select>
+	
+	<select id="queryRecommend" resultType="com.behere.video.model.UserSearchModel">
+        SELECT
+            u.id,
+            nick_name,
+            age,
+            gender,
+            signature,
+            u.online,
+            u.head_portrait,
+            u.face_time
+        FROM
+            t_user u
+        LEFT JOIN t_account_book r
+        <if test="auth != 1">
+            ON r.to_user = u.id
+        </if>
+        <if test="auth == 1">
+            ON r.from_user = u.id
+        </if>
+        WHERE
+            u.`online` = 1
+        <if test="auth != 1">
+            AND u.auth = 1
+        </if>
+        <if test="auth == 1">
+            AND u.auth != 1
+        </if>
+        <if test="gender == 1">
+            AND gender = 2
+        </if>
+        <if test="gender == 2">
+            AND gender = 1
+        </if>
+        GROUP BY
+            u.id
+        ORDER BY
+            sum(r.flower) DESC
+        LIMIT 0,5
+    </select>
+
+    <update id="updateUserOnOrOffOnline">
+        UPDATE
+          t_user
+        SET
+          online = #{online},
+          offline_time = now()
+        WHERE
+          id = #{userId}
+    </update>
+
+
+    <select id="queryUsers" resultType="com.behere.video.domain.OnlineUser">
+        SELECT
+            u.id,
+            u.head_portrait,
+            u.nick_name,
+            u.city,
+            u.age,
+            p.name as professionName,
+            u.signature,
+            u.wechat_code,
+            u.mobile,
+            u.gender,
+            u.netease_token,
+            u.balance,
+            u.service_price,
+            u.auth,
+            u.online,
+            u.flower,
+            u.vip,
+            u.face_time
+        FROM
+            t_user u
+        LEFT JOIN
+            t_profession p
+        ON
+            u.profession = p.id
+        LEFT JOIN
+            t_account_book b on TIMESTAMPDIFF(MINUTE, b.create_time, NOW()) <![CDATA[ < ]]> 5
+        <if test="auth == 1">
+            AND u.id = b.from_user
+        </if>
+        <if test="auth != 1">
+            AND u.id = b.to_user
+        </if>
+        WHERE
+            gender != 0 AND u.deleted = 0
+        <if test="gender != -1">
+            AND gender = #{gender}
+        </if>
+        GROUP BY u.id
+        ORDER BY u.online ASC
+        <if test="auth != 1">
+          , u.auth=2, u.auth DESC,
+        </if>
+        <if test="auth == 1">
+            , u.auth=1, u.auth ASC,
+        </if>
+        sum(b.flower) DESC, offline_time DESC
+    </select>
+
+	<insert id="saveAccountBook" parameterType="com.behere.video.domain.AccountBook">
+		INSERT INTO t_account_book (
+			id,
+			business_id,
+			from_user,
+			to_user,
+			flower,
+			type,
+			status,
+			reduce_flower
+		) VALUES (
+			#{id},
+			#{businessId},
+			#{fromUser},
+			#{toUser},
+			#{flower},
+			#{type},
+			#{status},
+			#{reduceFlower}
+		)
+
+	</insert>
+
+    <select id="queryTopThreeFlowerRanking" resultType="com.behere.video.model.FlowerRank">
+        SELECT
+            u.id AS fromUser,
+            u.nick_name,
+	        u.head_portrait,
+	        u.auth,
+	        sum(b.flower) as flower
+        FROM
+            t_account_book b
+        LEFT JOIN t_user u ON b.from_user = u.id
+        WHERE
+            b.to_user = #{toUser}
+        GROUP BY
+            b.from_user
+        ORDER BY
+            sum(b.flower) DESC
+        LIMIT 0,3
+    </select>
+
+
+    <select id="queryFlowerRankingList" resultType="com.behere.video.model.FlowerRank">
+        SELECT
+            u.id AS fromUser,
+            u.nick_name,
+            u.age,
+        	u.head_portrait,
+         	u.auth,
+         	sum(b.flower) as flower
+        FROM
+            t_account_book b
+        LEFT JOIN t_user u ON b.from_user = u.id
+        WHERE
+            b.to_user = #{toUser} AND b.flower > 0
+        GROUP BY
+            b.from_user
+        ORDER BY
+            sum(b.flower) DESC
+    </select>
+	
+	<select id="queryBestFriend" resultType="com.behere.video.domain.BestFriend">
+		SELECT
+			u.id,
+			u.nick_name,
+			u.gender,
+			u.head_portrait,
+			u.auth,
+			u.age,
+			sum(b.flower) as flower
+		FROM
+			t_watch_record b
+		LEFT JOIN t_user u ON b.from_user = u.id
+		WHERE
+			b.to_user = #{toUser}
+		GROUP BY
+			b.from_user
+		ORDER BY
+			sum(b.flower) DESC, b.create_time ASC
+		LIMIT 0,
+		 1
+	</select>
+    
+    <select id="queryFlowerRecordByMyIdWithOtherUserId" resultType="java.lang.Integer">
+        select sum(b.flower) from t_account_book b where b.from_user = #{fromUser} and b.to_user = #{toUser} and type = #{type}
+    </select>
+
+    <select id="queryMyPkInformation" resultType="com.behere.video.domain.BestFriend">
+        SELECT
+			u.id,
+			u.nick_name,
+			u.gender,
+			u.head_portrait,
+		 u.auth,
+		 u.age
+		FROM
+			t_user u
+		WHERE
+			u.id = #{userId}
+    </select>
+
+	<select id="lockUser" resultType="com.behere.video.model.UserModel">
+		SELECT * FROM t_user WHERE id in (#{fromUser}, #{toUser}) FOR UPDATE
+	</select>
+
+	<update id="updateUserAuth">
+		UPDATE
+			t_user
+		SET
+			auth = #{userAuth}
+		WHERE
+			id = #{userId}
+	</update>
+    
+    <select id="queryUserAuths" resultType="com.behere.video.model.UserAuth">
+        SELECT * FROM t_user_auth WHERE status = 0 AND user_id = #{userId}
+    </select>
+
+    <update id="updateAccountBookByBusinessId">
+        update t_account_book b set b.flower = b.flower + #{flower} where b.business_id = #{businessId}
+    </update>
+
+	<select id="queryTotalFlower" resultType="java.lang.Long">
+		SELECT ifnull(sum(flower / 2 - reduce_flower),0) as total_flower FROM t_account_book WHERE to_user = #{userId}
+	</select>
+
+    <update id="setUserOfflineTime">
+        UPDATE t_user u set offline_time = now() WHERE id = #{userId}
+    </update>
+    
+    <select id="queryUserIndexFlower" parameterType="com.behere.video.domain.UserIndex" resultType="long">
+        SELECT IFNULL(sum(flower), 0) FROM t_account_book WHERE
+        <if test="auth == 1">
+            to_user = #{id}
+        </if>
+        <if test="auth != 1">
+            from_user = #{id}
+        </if>
+    </select>
+
+
+
+    <!-- 认证用户和非认证用户首页列表 start -->
+    <!--<select id="queryUsers" resultType="com.behere.video.domain.OnlineUser">-->
+        <!--SELECT-->
+        <!--u.id,-->
+        <!--u.head_portrait,-->
+        <!--u.nick_name,-->
+        <!--u.city,-->
+        <!--u.age,-->
+        <!--p.name as professionName,-->
+        <!--u.signature,-->
+        <!--u.wechat_code,-->
+        <!--u.mobile,-->
+        <!--u.gender,-->
+        <!--u.netease_token,-->
+        <!--u.balance,-->
+        <!--u.service_price,-->
+        <!--u.auth,-->
+        <!--u.online,-->
+        <!--u.flower,-->
+        <!--u.vip-->
+        <!--FROM-->
+        <!--t_user u-->
+        <!--LEFT JOIN-->
+        <!--t_profession p-->
+        <!--ON-->
+        <!--u.profession = p.id-->
+        <!--WHERE-->
+        <!--gender != 0 AND u.deleted = 0-->
+        <!--<if test="gender != -1">-->
+            <!--AND gender = #{gender}-->
+        <!--</if>-->
+
+        <!--<if test="auth == 0 or auth == -1 or auth == 2">-->
+            <!--ORDER BY-->
+            <!--u.online ASC, u.auth=2, u.auth DESC-->
+        <!--</if>-->
+        <!--<if test="auth == 1">-->
+            <!--ORDER BY-->
+            <!--u.online ASC, u.auth=1, u.auth ASC-->
+        <!--</if>-->
+    <!--</select>-->
+    <!-- 认证用户和非认证用户首页列表 end -->
+	
+	<select id="queryGiftNameByBusinessId" resultType="java.lang.String">
+		SELECT
+			g.name
+		FROM
+			t_gift g
+		LEFT JOIN t_gift_record r ON r.gift_id = g.id
+		WHERE
+			r.id = #{businessId}
+	</select>
+	<select id="queryShortVideoTitleByBusinessId" resultType="java.lang.String">
+		SELECT
+            v.title
+        FROM
+            t_short_video v
+        LEFT JOIN t_video_record r ON v.id = r.video_id
+        WHERE
+            r.id = #{businessId}
+	</select>
+
+    <select id="queryUserByMyinvitation" resultType="com.behere.video.model.UserModel">
+        SELECT * FROM t_user WHERE my_invitation_code = #{invitationCode}
+    </select>
+    
+    <select id="countMyInvitationUser" resultType="java.lang.Long">
+        select count(*) from t_user u where u.invitation_code = #{invitationCode}
+        <if test="type == 1">
+            AND auth = 1
+        </if>
+    </select>
+    
+    <select id="countSharingUserContributionValue" resultType="java.lang.Double">
+        SELECT
+            IFNULL(sum(diamond) * 10 * 0.35, 0)
+        FROM
+            t_recharge_record r
+        LEFT JOIN t_user u ON r.user_id = u.id
+        WHERE
+            u.invitation_code = #{invitationCode}
+        AND r.pay_type = 1
+    </select>
+
+    <select id="countSharingAuthUserContributionValue" resultType="java.lang.Double">
+        select IFNULL(sum(b.flower) / 2 * 0.1, 0) from t_account_book b LEFT join t_user u on u.id = b.to_user where b.status = 1 AND u.invitation_code = #{invitationCode}
+    </select>
+
+    <select id="listSharingAuthUser" resultType="com.behere.video.domain.ShareUser">
+        select
+          u.id as sharedUserId,
+          u.create_time,
+          u.nick_name,
+          sum(b.flower) / 2 as contributionValue
+        from
+          t_user u
+        LEFT join
+          t_account_book b
+        on
+          u.id = b.to_user AND b.status = 1
+        where u.invitation_code = #{invitationCode} group by u.id ORDER BY sum(b.flower) DESC
+    </select>
+    <select id="listSharingUserRecharge" resultType="com.behere.video.domain.ShareUser">
+        SELECT
+            u.id as sharedUserId, u.create_time,
+            u.nick_name,
+            sum(r.diamond * 10) as contributionValue
+        FROM
+            t_user u
+        LEFT JOIN t_recharge_record r ON r.user_id = u.id AND r.pay_type = 1
+        WHERE
+            u.invitation_code = #{invitationCode}
+
+        GROUP By u.id
+        ORDER BY sum(r.diamond) DESC
+    </select>
+    
+    <update id="updateUserFaceTime">
+        UPDATE t_user SET face_time = #{status} WHERE id = #{customerId} OR id = #{serviceId}
+    </update>
+
+    <insert id="saveWritingChatRecord" parameterType="com.behere.video.model.WritingChat">
+        INSERT INTO t_writing_chat_record(callerId, calledId) VALUES (#{callerId}, #{calledId})
+    </insert>
+    
+    <select id="countWritingChatRecord" resultType="java.lang.Long">
+        SELECT count(*) FROM t_writing_chat_record WHERE callerId = #{callerId} AND calledId = #{calledId}
+    </select>
+</mapper>
